@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <label for="pageNumberInput">Номер страницы:</label>
+        <input type="text"  id="pageNumberInput" >
+    </div>
+    <div>
+        <label for="limitInput">Лимит:</label>
+        <input type="text"  id="limitInput" >
+    </div>
+    <button id="requestButton">Запрос</button>
+    <div id="errorMessage" style="color:red;"></div>
+    <div id="result"></div>
+    <script>
+        console.log("sdfsdf");
+        document.addEventListener("DOMContentLoaded", () => {
+    const pageNumberInput = document.getElementById("pageNumberInput"),
+        limitInput = document.getElementById("limitInput"),
+        requestButton = document.getElementById("requestButton"),
+        errorMessage = document.getElementById("errorMessage"),
+        result = document.getElementById("result");
+    
+    // Проверка введенного числа на соответствие типу данных числу и диапазона
+    function validateNumber(number){
+        return !isNaN(number) && parseInt(number) >= 1 && parseInt(number) <= 10;
+    }
+    
+    function makeRequest() {
+        const pageNumber = pageNumberInput.value.trim();
+        const limit = limitInput.value.trim();
+        // Проверка номера страницы и лимита
+        const isPageNumberValid = validateNumber(pageNumber);
+        const isLimitValid = validateNumber(limit);
+        // Если номер страницы не в диапазоне или не число
+        if (!isPageNumberValid) {
+            errorMessage.textContent = "Номер страницы вне диапазона от 1 до 10";
+            return;
+        }
+        // Если номер страницы и лимит вне диапазона или они не явзяются числами.
+        if (!isPageNumberValid && !isLimitValid) {
+            errorMessage.textContent = "Номер страницы и лимит вне диапазона от 1 до 10";
+            return;
+        }
+        if (!isLimitValid) {
+            errorMessage.textContent = "Лимит вне диапазона от 1 до 10";
+            return;
+        }
+        
+        localStorage.setItem("pageNumber", pageNumber);
+        localStorage.setItem("limit", limit);
+        const url = `https://jsonplaceholder.typicode.com/photos?_page=${pageNumber}&_limit=${limit}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                result.innerHTML = "";
+                // Отображение картинок из ответа
+                data.forEach(photo => {
+                    const img = document.createElement('img');
+                    img.src = photo.thumbnailUrl;
+                    result.appendChild(img);
+                });
+                errorMessage.textContent = "";
+            })
+            .catch(error => {
+                console.error("Ошибка при выполнении запроса", error);
+                errorMessage.textContent = "Произошла ошибка при выполнении запроса";
+            });
+    }
+    
+    requestButton.addEventListener("click", makeRequest);
+
+    // При загрузке страницы проверяем наличие сохраненных данных в localStorage
+    const savedPageNumber = localStorage.getItem("pageNumber");
+    const savedLimit = localStorage.getItem("limit");
+    if (savedPageNumber && savedLimit) {
+        pageNumberInput.value = savedPageNumber;
+        limitInput.value = savedLimit;
+        makeRequest();
+    }
+});
+    </script>
+</body>
+</html> 

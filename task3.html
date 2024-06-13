@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XHR Запрос пример</title>
+</head>
+<body>
+  <input type="number" id="numberInput" placeholder="Введите число от 1 до 10">
+  <button id="submitButton">Подтвердить</button>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('submitButton').addEventListener('click', function() {
+      const numberInput = parseInt(document.getElementById('numberInput').value);
+
+      if (numberInput < 1 || numberInput > 10 || isNaN(numberInput)) {
+        document.getElementById('result').innerText = 'Number is out of range (1-10)';
+      } else {
+        const xhr = new XMLHttpRequest();
+        const url = `https://jsonplaceholder.typicode.com/photos?_limit=${numberInput}`;
+
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            const photos = JSON.parse(xhr.responseText);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            photos.forEach(photo => {
+              const img = document.createElement('img');
+              img.src = photo.thumbnailUrl;
+              resultDiv.appendChild(img);
+            });
+          }
+        };
+
+        xhr.open('GET', url, true);
+        xhr.send();
+      }
+    });
+  </script>
+</body>
+</html>

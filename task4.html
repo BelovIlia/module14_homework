@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+        <h2>Введите ширину и высоту от 100 до 300</h2>
+        <input type="text" id="widthInput" placeholder="Ширина" >
+        <input type="text" id="heightInput" placeholder="Высота" >
+        <button id="submitButton">Подтвердить</button>
+        <div id="result"></div>
+        
+        <script src="tasc4.js">
+            document.getElementById("submitButton").addEventListener("click", async () => {
+        const widthInput = document.getElementById("widthInput").value;
+        const heightInput = document.getElementById("heightInput").value;
+
+    //Проверка наличия чисел и их диапазона.
+    if(isNaN(widthInput)|| isNaN(heightInput) || widthInput < 100 || widthInput > 300 || heightInput < 100 || heightInput > 300){
+        document.getElementById("result").innerHTML= "Вне диапазона от 100 до 300";
+        return;
+    }
+
+    const url = `https://dummyimage.com/${widthInput}x${heightInput}/`;
+
+    try { 
+        const response = await fetch(url);
+        if(!response.ok){ 
+            throw new Error("Ошибка при загрузке изображения");
+        }
+        const imageUrl = response.url;
+        const imageElem = document.createElement("img");
+        imageElem.src = imageUrl;
+        document.getElementById("result").innerHTML="";
+        document.getElementById("result").appendChild(imageElem);
+    } catch (error) {
+        console.log(error);
+        document.getElementById("result").innerHTML = error.message;
+    }
+});
+        </script>
+</body>
+</html>
